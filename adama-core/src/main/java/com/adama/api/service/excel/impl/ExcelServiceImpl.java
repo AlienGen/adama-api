@@ -74,6 +74,11 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 
 	@Override
 	public <T> InputStream createExcel(List<T> objectList, String entityName) throws ExcelException {
+		return createExcelOrdered(objectList, entityName, new IdFirstComparator());
+	}
+
+	@Override
+	public <T> InputStream createExcelOrdered(List<T> objectList, String entityName, Comparator<? super String> comparator) throws ExcelException {
 		XSSFWorkbook wb;
 		try {
 			wb = getWorkWook(entityName);
@@ -97,8 +102,7 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 					}
 				}).collect(Collectors.toList());
 				// we get a KeySet with all the elements of each keySet
-				List<String> headerList = listMap.parallelStream().flatMap(map -> map.keySet().stream()).filter(distinctByKey(String::toLowerCase)).sorted(new IdFirstComparator())
-						.collect(Collectors.toList());
+				List<String> headerList = listMap.parallelStream().flatMap(map -> map.keySet().stream()).filter(distinctByKey(String::toLowerCase)).sorted(comparator).collect(Collectors.toList());
 				// we create the first Row with the keyName
 				Row firstRow = entitySheet.getRow(0);
 				IntStream.range(0, headerList.size()).forEach(i -> {

@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import com.adama.api.service.excel.exception.ExcelException;
+import java.util.Comparator;
 
 public interface ExcelServiceInterface {
 	/**
@@ -17,6 +18,21 @@ public interface ExcelServiceInterface {
 	 * @throws {@link ExcelException}:
 	 */
 	public <T> InputStream createExcel(List<T> objectList, String entityName) throws ExcelException;
+
+	/**
+	 * Create Excel file from object list, need the entity of the object in the
+	 * list
+	 * 
+	 * @param objectList
+	 * @param name
+	 *            of entity
+	 * @param comparator
+	 *            sort the fields
+	 * 
+	 * @return {@link InputStream}
+	 * @throws {@link ExcelException}:
+	 */
+	public <T> InputStream createExcelOrdered(List<T> objectList, String entityName, Comparator<? super String> comparator) throws ExcelException;
 
 	/**
 	 * Read Excel file and fill the object with it
