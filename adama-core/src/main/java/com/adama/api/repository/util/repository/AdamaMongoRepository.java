@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import org.springframework.data.domain.Sort;
 
 /**
  * Adama Mongo specific {@link org.springframework.data.repository.Repository}
@@ -37,6 +38,16 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * @return
 	 */
 	Page<T> findAllQueryPageable(Optional<Query> query, Optional<Pageable> pageable);
+
+	/**
+	 * find all with the query, the sortable and the pageable
+	 * 
+	 * @param query
+	 * @param sort
+	 * @param pageable
+	 * @return
+	 */
+	Page<T> findAllQueryPageable(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional);
 
 	/**
 	 * find all with the query

@@ -239,7 +239,17 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 		return new PageImpl<>(list, pageableOptional.orElse(null), count);
 	}
 
-	private List<T> findAll(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional) {
+	public Page<T> findAllQueryPageable(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional) {
+		// query
+		List<T> list = findAll(queryOptional, sortOptional, pageableOptional);
+		// count
+		Query countQuery = queryOptional.orElse(new Query().addCriteria(getFilterCriteria()));
+		Long count = count(countQuery);
+		// result
+		return new PageImpl<>(list, pageableOptional.orElse(null), count);
+	}
+
+	public List<T> findAll(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional) {
 		// get the list of sorting with primitive field
 		List<Order> orderPrimitiveList = sortOptional//
 				.map(//
@@ -353,7 +363,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 		return fullEntityList;
 	}
 
-	private long count(Query query) {
+	public long count(Query query) {
 		return mongoOperations.getCollection(entityInformation.getCollectionName()).count(query.getQueryObject());
 	}
 

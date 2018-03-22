@@ -13,6 +13,13 @@ import org.springframework.util.Assert;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.repository.util.repository.AdamaMongoRepository;
 import com.adama.api.repository.util.repository.abst.AdamaMongoRepositoryAbstract;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Query;
 
 /**
  * Adama Repository base implementation for Mongo.
