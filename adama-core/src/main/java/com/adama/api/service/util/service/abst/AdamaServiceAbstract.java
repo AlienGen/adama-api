@@ -10,8 +10,10 @@ import org.springframework.data.domain.Pageable;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.repository.util.repository.AdamaMongoRepository;
 import com.adama.api.service.util.service.AdamaServiceInterface;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 
 @Slf4j
 public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R extends AdamaMongoRepository<D, String>> implements AdamaServiceInterface<D> {
@@ -50,6 +52,11 @@ public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R ext
 	@Override
 	public Iterable<D> findAll(List<String> idList) {
 		return repo.findAll(idList);
+	}
+
+	@Override
+	public Iterable<D> findAll(List<String> idList, Sort sort) {
+		return repo.findAll(idList, Optional.of(sort));
 	}
 
 	@Override

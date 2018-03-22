@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import org.springframework.data.domain.Sort;
 
 /**
  * Service Interface for managing Entity.
@@ -53,6 +54,17 @@ public interface AdamaServiceInterface<D extends DeleteEntityAbstract> {
 	 * @return the entity list
 	 */
 	Iterable<D> findAll(List<String> idList);
+
+	/**
+	 * Get a list of "id" adamaEntity.
+	 * 
+	 * @param id
+	 *            the id of the entity
+	 * @param sort
+	 *            the sort
+	 * @return the entity list
+	 */
+	Iterable<D> findAll(List<String> idList, Sort sort);
 
 	/**
 	 * Delete the "id" adamaEntity.

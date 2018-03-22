@@ -59,6 +59,16 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	List<T> findAll(Optional<Query> query);
 
 	/**
+	 * find all with the id list
+	 * 
+	 * @param idList
+	 * @param sort
+	 * 
+	 * @return
+	 */
+	List<T> findAll(Iterable<ID> idList, Optional<Sort> sort);
+
+	/**
 	 * find one with the query
 	 * 
 	 * @param query
