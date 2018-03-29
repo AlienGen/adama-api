@@ -38,6 +38,7 @@
         <poi.version>3.13</poi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet-api.version>2.5</servlet-api.version>
+        <!--<spring-boot.version>1.5.10.RELEASE</spring-boot.version>-->
         <springfox.version>2.4.0</springfox.version>
         <wnameless.version>0.2.1</wnameless.version>
     </properties>
@@ -171,7 +172,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-mongodb</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>2.0.0.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>

@@ -92,7 +92,7 @@ public abstract class AdamaResourceAbstract<D extends DeleteEntityAbstract, T ex
 			page = service.searchAll(search, pageable);
 		} else {
 			if (all != null && all) {
-				pageable = new PageRequest(0, Integer.MAX_VALUE);
+				pageable = new PageRequest(0, Integer.MAX_VALUE, pageable.getSort());
 			}
 			page = service.findAll(pageable);
 		}
