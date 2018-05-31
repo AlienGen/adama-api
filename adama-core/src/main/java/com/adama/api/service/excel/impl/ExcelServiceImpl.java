@@ -63,6 +63,7 @@ import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 @Slf4j
 @Service
@@ -87,10 +88,10 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 				// create the style
 				this.dateCellStyle = wb.createCellStyle();
 				this.dateCellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("d-mmm-yy"));
-				this.dateCellStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+				this.dateCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 				this.cellStyle = wb.createCellStyle();
 				this.cellStyle.setWrapText(true);
-				this.cellStyle.setVerticalAlignment(CellStyle.VERTICAL_CENTER);
+				this.cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 				// create a list of map for each object, each object could have
 				// a size of fieldName different
 				List<Map<String, Object>> listMap = objectList.parallelStream().map(object -> {
