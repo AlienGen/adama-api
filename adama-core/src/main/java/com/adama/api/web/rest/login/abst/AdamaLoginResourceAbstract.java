@@ -50,7 +50,6 @@ public abstract class AdamaLoginResourceAbstract<D extends DeleteEntityAbstract,
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> authorize(@Valid @RequestBody LoginDTO loginDTO, HttpServletResponse response) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
-		try {
 			Authentication authentication = authenticationManager.authenticate(authenticationToken);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			boolean rememberMe = (loginDTO.getRememberMe() == null) ? false : loginDTO.getRememberMe();
@@ -63,9 +62,6 @@ public abstract class AdamaLoginResourceAbstract<D extends DeleteEntityAbstract,
 			tokenDTO.setRememberMe(loginDTO.getRememberMe());
 			response.addHeader(JWTUtils.AUTHORIZATION_HEADER, "Bearer " + accessToken);
 			return ResponseEntity.ok(tokenDTO);
-		} catch (AuthenticationException exception) {
-			return new ResponseEntity<>(exception.getLocalizedMessage(), HttpStatus.UNAUTHORIZED);
-		}
 	}
 
 	@Override
