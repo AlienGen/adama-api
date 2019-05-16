@@ -1,14 +1,5 @@
 package com.adama.api.service.user.abst;
 
-import java.time.ZonedDateTime;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.Assert;
-
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.repository.user.AdamaUserRepositoryInterface;
@@ -18,8 +9,14 @@ import com.adama.api.service.user.AdamaUserServiceInterface;
 import com.adama.api.service.util.service.abst.AdamaServiceAbstract;
 import com.adama.api.util.random.RandomUtil;
 import com.adama.api.util.security.SecurityUtils;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
 /**
  * Abstract Service class for managing users.
@@ -39,7 +36,7 @@ public abstract class AdamaUserServiceAbstract<D extends DeleteEntityAbstract, A
 	@Override
 	public Optional<A> completePasswordReset(String newPassword, String key) {
 		log.debug("Reset user password for reset key {}", key);
-		return userRepository.findOneByResetKey(key).filter(user -> {
+		return userRepository.findByResetKey(key).filter(user -> {
 			ZonedDateTime oneDayAgo = ZonedDateTime.now().minusHours(72);
 			return user.getResetDate().isAfter(oneDayAgo);
 		}).map(user -> {
@@ -54,7 +51,7 @@ public abstract class AdamaUserServiceAbstract<D extends DeleteEntityAbstract, A
 	@Override
 	public Optional<A> requestPasswordReset(String mail) {
 		log.debug("ask for requestPasswordReset with email : {}", mail);
-		return userRepository.findOneByEmail(mail).filter(AdamaUser::getActive).map(user -> {
+		return userRepository.findByEmail(mail).filter(AdamaUser::getActive).map(user -> {
 			user.setResetKey(RandomUtil.generateResetKey());
 			user.setResetDate(ZonedDateTime.now());
 			userRepository.save(user);
@@ -85,7 +82,7 @@ public abstract class AdamaUserServiceAbstract<D extends DeleteEntityAbstract, A
 	@Override
 	public void changePassword(String password) {
 		SecurityUtils.getCurrentUserLogin().ifPresent(login -> {
-			userRepository.findOneByLogin(login).ifPresent(u -> {
+			userRepository.findByLogin(login).ifPresent(u -> {
 				String encryptedPassword = passwordEncoder.encode(password);
 				u.setPassword(encryptedPassword);
 				userRepository.save(u);
@@ -95,13 +92,13 @@ public abstract class AdamaUserServiceAbstract<D extends DeleteEntityAbstract, A
 	}
 
 	@Override
-	public Optional<A> findOneByLogin(String login) {
-		return userRepository.findOneByLogin(login);
+	public Optional<A> findByLogin(String login) {
+		return userRepository.findByLogin(login);
 	}
 
 	@Override
-	public Optional<A> findOneByEmail(String email) {
-		return userRepository.findOneByEmail(email);
+	public Optional<A> findByEmail(String email) {
+		return userRepository.findByEmail(email);
 	}
 
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
@@ -118,6 +115,6 @@ public abstract class AdamaUserServiceAbstract<D extends DeleteEntityAbstract, A
 		if (!currentUserLogin.isPresent()) {
 			return Optional.empty();
 		}
-		return findOneByLogin(currentUserLogin.get());
+		return findByLogin(currentUserLogin.get());
 	}
 }

@@ -1,19 +1,16 @@
 package com.adama.api.service.util.service.abst;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.repository.util.repository.AdamaMongoRepository;
 import com.adama.api.service.util.service.AdamaServiceInterface;
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R extends AdamaMongoRepository<D, String>> implements AdamaServiceInterface<D> {
@@ -45,13 +42,13 @@ public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R ext
 	@Override
 	public D findOne(String id) {
 		log.debug("Request to get Entity : {}", id);
-		D entity = repo.findOne(id);
+		D entity = repo.findById(id).get();
 		return entity;
 	}
 
 	@Override
 	public Iterable<D> findAll(List<String> idList) {
-		return repo.findAll(idList);
+		return repo.findAllById(idList);
 	}
 
 	@Override
@@ -62,7 +59,7 @@ public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R ext
 	@Override
 	public void delete(String id) {
 		log.debug("Request to delete Client : {}", id);
-		repo.delete(id);
+		repo.deleteById(id);
 	}
 
 	@Override

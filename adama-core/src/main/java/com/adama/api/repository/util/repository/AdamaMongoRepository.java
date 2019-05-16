@@ -1,17 +1,16 @@
 package com.adama.api.repository.util.repository;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import org.springframework.data.domain.Sort;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Adama Mongo specific {@link org.springframework.data.repository.Repository}
@@ -67,7 +66,6 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * @return
 	 */
 	List<T> findAll(Iterable<ID> idList, Optional<Sort> sort);
-
 	/**
 	 * find one with the query
 	 * 
@@ -75,5 +73,5 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * 
 	 * @return
 	 */
-	T findOne(Optional<Query> query);
+	// T findOne(Optional<Query> query);
 }

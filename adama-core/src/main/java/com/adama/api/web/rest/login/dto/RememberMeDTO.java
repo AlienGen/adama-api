@@ -1,7 +1,6 @@
 package com.adama.api.web.rest.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data

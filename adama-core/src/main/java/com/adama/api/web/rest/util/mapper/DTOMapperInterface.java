@@ -1,9 +1,9 @@
 package com.adama.api.web.rest.util.mapper;
 
+import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
+
 import java.io.Serializable;
 import java.util.List;
-
-import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
 
 /**
  * Mapper Interface for mapping DTO and Entity

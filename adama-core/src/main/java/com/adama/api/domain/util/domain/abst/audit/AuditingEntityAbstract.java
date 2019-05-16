@@ -1,15 +1,14 @@
 package com.adama.api.domain.util.domain.abst.audit;
 
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-
+import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import lombok.Data;
+import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 /**
  * Base abstract class for entities which will hold definitions for created,
@@ -25,14 +24,14 @@ public abstract class AuditingEntityAbstract implements Serializable {
 	public static final String VERSION_FIELD_NAME = "version";
 	@CreatedBy
 	@Field(CREATEBY_FIELD_NAME)
-	private String createdBy;
+	protected String createdBy;
 	@CreatedDate
 	@Field(CREATEDATE_FIELD_NAME)
-	private ZonedDateTime createdDate = ZonedDateTime.now();
+	protected ZonedDateTime createdDate = ZonedDateTime.now();
 	@LastModifiedBy
 	@Field(LASTMODIFIEDBY_FIELD_NAME)
-	private String lastModifiedBy;
+	protected String lastModifiedBy;
 	@LastModifiedDate
 	@Field(LASTMODIFIEDDATE_FIELD_NAME)
-	private ZonedDateTime lastModifiedDate = ZonedDateTime.now();
+	protected ZonedDateTime lastModifiedDate = ZonedDateTime.now();
 }

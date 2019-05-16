@@ -1,9 +1,10 @@
 package com.adama.api.security;
 
+import com.adama.api.util.security.SecurityUtils;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
-import com.adama.api.util.security.SecurityUtils;
+import java.util.Optional;
 
 /**
  * Implementation of AuditorAware based on Spring Security.
@@ -11,8 +12,8 @@ import com.adama.api.util.security.SecurityUtils;
 @Component
 public class SpringSecurityAuditorAware implements AuditorAware<String> {
 	@Override
-	public String getCurrentAuditor() {
+	public Optional<String> getCurrentAuditor() {
 		String userName = SecurityUtils.getCurrentUserLogin().orElse("Unknow");
-		return userName;
+		return Optional.of(userName);
 	}
 }

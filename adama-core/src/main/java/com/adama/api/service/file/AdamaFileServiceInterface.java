@@ -1,10 +1,10 @@
 package com.adama.api.service.file;
 
+import com.adama.api.domain.file.AdamaFileAbstract;
+
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-
-import com.adama.api.domain.file.AdamaFileAbstract;
 
 /**
  * Interface for managing the file

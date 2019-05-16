@@ -1,25 +1,16 @@
 package com.adama.api.repository.util.repository.impl;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
-import java.io.Serializable;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.repository.util.repository.AdamaMongoRepository;
+import com.adama.api.repository.util.repository.abst.AdamaMongoRepositoryAbstract;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.util.Assert;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.repository.util.repository.AdamaMongoRepository;
-import com.adama.api.repository.util.repository.abst.AdamaMongoRepositoryAbstract;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Query;
+import java.io.Serializable;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * Adama Repository base implementation for Mongo.
@@ -29,11 +20,6 @@ import org.springframework.data.mongodb.core.query.Query;
 public class AdamaMongoRepositoryImpl<T extends DeleteEntityAbstract, ID extends Serializable> extends AdamaMongoRepositoryAbstract<T, ID> implements AdamaMongoRepository<T, ID> {
 	public AdamaMongoRepositoryImpl(MongoEntityInformation<T, ID> metadata, MongoOperations mongoOperations) {
 		super(metadata, mongoOperations);
-	}
-
-	public T findOne(ID id) {
-		Assert.notNull(id, "The given id must not be null!");
-		return mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
 
 	protected Criteria getIdCriteria(Object id) {

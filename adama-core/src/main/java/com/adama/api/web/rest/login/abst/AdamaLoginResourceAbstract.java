@@ -1,15 +1,18 @@
 package com.adama.api.web.rest.login.abst;
 
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import com.adama.api.config.AdamaProperties;
+import com.adama.api.domain.user.AdamaUser;
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.security.jwt.abstr.TokenProviderAbstract;
+import com.adama.api.service.user.AdamaUserServiceInterface;
+import com.adama.api.util.jwt.JWTUtils;
+import com.adama.api.web.rest.login.AdamaLoginResourceInterface;
+import com.adama.api.web.rest.login.dto.LoginDTO;
+import com.adama.api.web.rest.login.dto.RefreshDTO;
+import com.adama.api.web.rest.login.dto.TokenDTO;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,20 +27,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.adama.api.config.AdamaProperties;
-import com.adama.api.domain.user.AdamaUser;
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.security.jwt.abstr.TokenProviderAbstract;
-import com.adama.api.service.user.AdamaUserServiceInterface;
-import com.adama.api.util.jwt.JWTUtils;
-import com.adama.api.web.rest.login.AdamaLoginResourceInterface;
-import com.adama.api.web.rest.login.dto.LoginDTO;
-import com.adama.api.web.rest.login.dto.RefreshDTO;
-import com.adama.api.web.rest.login.dto.TokenDTO;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public abstract class AdamaLoginResourceAbstract<D extends DeleteEntityAbstract, A extends AdamaUser<D>> implements AdamaLoginResourceInterface<A> {
 	@Inject
@@ -89,7 +86,7 @@ public abstract class AdamaLoginResourceAbstract<D extends DeleteEntityAbstract,
 						if (details != null) {
 							authentication.setDetails((String) details);
 						}
-						return userService.findOneByLogin(authentication.getName()).map(user -> {
+						return userService.findByLogin(authentication.getName()).map(user -> {
 							if (refreshDTO != null && StringUtils.hasText(refreshDTO.getRefreshToken())) {
 								if (tokenProvider.validateRefreshToken(refreshDTO.getRefreshToken(), user.getLogin(), user.getResetDate())) {
 									boolean rememberMe = (refreshDTO.getRememberMe() == null) ? false : refreshDTO.getRememberMe();

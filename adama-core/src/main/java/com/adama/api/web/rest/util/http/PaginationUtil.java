@@ -1,11 +1,11 @@
 package com.adama.api.web.rest.util.http;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
-
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
 
 /**
  * Utility class for handling pagination.

@@ -1,12 +1,10 @@
 package com.adama.api.domain.util.domain.abst.delete;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
-
 import com.adama.api.domain.util.domain.abst.audit.AuditingEntityAbstract;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Base abstract class for entities which will hold an activated tag. If we

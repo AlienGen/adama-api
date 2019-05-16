@@ -1,22 +1,19 @@
 package com.adama.api.domain.user;
 
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.domain.util.domain.abst.tenant.TenantEntityAbstract;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Email;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.domain.util.domain.abst.tenant.TenantEntityAbstract;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 /**
  * An adama user.
@@ -65,6 +62,6 @@ public class AdamaUser<D extends DeleteEntityAbstract> extends DeleteEntityAbstr
 	@Field(AUTHORITY_FIELD_NAME)
 	private GrantedAuthority authority;
 	@Field(TenantEntityAbstract.TENANT_FIELD_NAME)
-	@DBRef
+	@DBRef(lazy = true)
 	private D tenant;
 }

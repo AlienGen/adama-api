@@ -1,12 +1,14 @@
 package com.adama.api.util.date;
 
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.data.convert.WritingConverter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import org.springframework.core.convert.converter.Converter;
 
 public final class JSR310DateConverters {
 	private JSR310DateConverters() {
@@ -23,6 +25,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@WritingConverter
 	public static class DateToLocalDateConverter implements Converter<Date, LocalDate> {
 		public static final DateToLocalDateConverter INSTANCE = new DateToLocalDateConverter();
 
@@ -34,6 +37,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@ReadingConverter
 	public static class ZonedDateTimeToDateConverter implements Converter<ZonedDateTime, Date> {
 		public static final ZonedDateTimeToDateConverter INSTANCE = new ZonedDateTimeToDateConverter();
 
@@ -45,6 +49,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@WritingConverter
 	public static class DateToZonedDateTimeConverter implements Converter<Date, ZonedDateTime> {
 		public static final DateToZonedDateTimeConverter INSTANCE = new DateToZonedDateTimeConverter();
 
@@ -56,6 +61,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@WritingConverter
 	public static class ZonedDateTimeToStringConverter implements Converter<ZonedDateTime, String> {
 		public static final ZonedDateTimeToStringConverter INSTANCE = new ZonedDateTimeToStringConverter();
 
@@ -67,6 +73,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@ReadingConverter
 	public static class StringToZonedDateTimeConverter implements Converter<String, ZonedDateTime> {
 		public static final StringToZonedDateTimeConverter INSTANCE = new StringToZonedDateTimeConverter();
 
@@ -78,6 +85,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@WritingConverter
 	public static class LocalDateTimeToStringConverter implements Converter<LocalDate, String> {
 		public static final LocalDateTimeToStringConverter INSTANCE = new LocalDateTimeToStringConverter();
 
@@ -89,6 +97,7 @@ public final class JSR310DateConverters {
 		}
 	}
 
+	@ReadingConverter
 	public static class StringToLocalDateTimeConverter implements Converter<String, LocalDate> {
 		public static final StringToLocalDateTimeConverter INSTANCE = new StringToLocalDateTimeConverter();
 

@@ -1,5 +1,17 @@
 package com.adama.api.security.jwt.abstr;
 
+import com.adama.api.config.AdamaProperties;
+import com.adama.api.domain.user.AdamaUser;
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.service.user.AdamaUserServiceInterface;
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -8,25 +20,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import com.adama.api.config.AdamaProperties;
-import com.adama.api.domain.user.AdamaUser;
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.service.user.AdamaUserServiceInterface;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class TokenProviderAbstract<D extends DeleteEntityAbstract, A extends AdamaUser<D>> {
@@ -42,7 +35,7 @@ public abstract class TokenProviderAbstract<D extends DeleteEntityAbstract, A ex
 		String authorities = authentication.getAuthorities().stream().map(authority -> authority.getAuthority()).collect(Collectors.joining(","));
 		Date expiredDate = Date.from(validity.toInstant());
 		// if we get the user with a tenant, we add the tenant Id in the claim
-		Optional<A> user = userService.findOneByLogin(authentication.getName());
+		Optional<A> user = userService.findByLogin(authentication.getName());
 		return user
 				.filter(u -> u.getTenant() != null)
 				.map(u -> Jwts.builder().setSubject(authentication.getName()).claim(AUTHORITIES_KEY, authorities).claim(TENANT_ID, u.getTenant().getId())

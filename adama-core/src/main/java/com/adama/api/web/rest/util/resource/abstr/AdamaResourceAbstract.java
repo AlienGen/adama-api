@@ -1,18 +1,15 @@
 package com.adama.api.web.rest.util.resource.abstr;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.service.excel.ExcelServiceInterface;
+import com.adama.api.service.excel.exception.ExcelException;
+import com.adama.api.service.util.service.AdamaServiceInterface;
+import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
+import com.adama.api.web.rest.util.http.HeaderUtil;
+import com.adama.api.web.rest.util.http.PaginationUtil;
+import com.adama.api.web.rest.util.mapper.DTOMapperInterface;
+import com.adama.api.web.rest.util.resource.AdamaResourceInterface;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,17 +22,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.service.excel.ExcelServiceInterface;
-import com.adama.api.service.excel.exception.ExcelException;
-import com.adama.api.service.util.service.AdamaServiceInterface;
-import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
-import com.adama.api.web.rest.util.http.HeaderUtil;
-import com.adama.api.web.rest.util.http.PaginationUtil;
-import com.adama.api.web.rest.util.mapper.DTOMapperInterface;
-import com.adama.api.web.rest.util.resource.AdamaResourceInterface;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * REST controller for managing Entity.

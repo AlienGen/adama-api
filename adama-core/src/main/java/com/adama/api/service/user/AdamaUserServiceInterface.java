@@ -1,9 +1,9 @@
 package com.adama.api.service.user;
 
-import java.util.Optional;
-
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+
+import java.util.Optional;
 
 /**
  * Interface Service class for managing users.
@@ -48,7 +48,7 @@ public interface AdamaUserServiceInterface<A extends AdamaUser<? extends DeleteE
 	 * @param login
 	 * @return
 	 */
-	Optional<A> findOneByLogin(String login);
+	Optional<A> findByLogin(String login);
 
 	/**
 	 * Find one user by email
@@ -56,7 +56,7 @@ public interface AdamaUserServiceInterface<A extends AdamaUser<? extends DeleteE
 	 * @param email
 	 * @return
 	 */
-	Optional<A> findOneByEmail(String email);
+	Optional<A> findByEmail(String email);
 
 	//
 	// /**

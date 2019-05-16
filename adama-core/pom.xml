@@ -4,7 +4,7 @@
     <parent>
         <artifactId>adama-parent</artifactId>
         <groupId>com.adama</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
     <artifactId>adama-core</artifactId>
     <packaging>jar</packaging>
@@ -64,6 +64,10 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <!-- <dependency> -->
         <!-- <groupId>io.swagger</groupId> -->

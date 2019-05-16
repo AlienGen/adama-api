@@ -1,25 +1,23 @@
 package com.adama.api.config.apidoc;
 
-import static springfox.documentation.builders.PathSelectors.regex;
-
-import java.util.Date;
-
+import com.adama.api.config.AdamaProperties;
+import com.google.common.base.Predicates;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
-
-import com.adama.api.config.AdamaProperties;
-import com.google.common.base.Predicates;
-
-import lombok.extern.slf4j.Slf4j;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.Date;
+
+import static springfox.documentation.builders.PathSelectors.regex;
 
 /**
  * Springfox Swagger configuration.

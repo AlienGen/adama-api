@@ -1,20 +1,18 @@
 package com.adama.api.web.rest.login;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.web.rest.login.dto.LoginDTO;
 import com.adama.api.web.rest.login.dto.RefreshDTO;
 import com.adama.api.web.rest.login.dto.TokenDTO;
-
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Rest resource for login and refresh token

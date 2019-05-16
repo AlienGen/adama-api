@@ -1,28 +1,21 @@
 package com.adama.api.web.rest.util.resource.abstr;
 
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import com.adama.api.service.excel.exception.ExcelException;
 import com.adama.api.service.util.service.AdamaServiceInterface;
 import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
 import com.adama.api.web.rest.util.mapper.DTOMapperInterface;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.List;
 
 public abstract class AdamaResourceAbstractWithMapping<D extends DeleteEntityAbstract, T extends AdamaDtoAbstract, S extends AdamaServiceInterface<D>, M extends DTOMapperInterface<D, T>> extends
 		AdamaResourceAbstract<D, T, S, M> {

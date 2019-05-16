@@ -1,18 +1,17 @@
 package pl.maciejwalkowiak.springdata.mongodb;
 
-import java.lang.reflect.Field;
-
-import javax.inject.Inject;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mapping.model.MappingException;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
+import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.inject.Inject;
+import java.lang.reflect.Field;
 
 /**
  * This class aims to simplify cascade saving for Mongo DB.
@@ -29,7 +28,7 @@ public class CascadingMongoEventListener extends AbstractMongoEventListener {
 	private MongoOperations mongoOperations;
 
 	@Override
-	public void onBeforeConvert(final Object source) {
+	public void onBeforeConvert(BeforeConvertEvent source) {
 		ReflectionUtils.doWithFields(source.getClass(), new ReflectionUtils.FieldCallback() {
 			@Override
 			public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {

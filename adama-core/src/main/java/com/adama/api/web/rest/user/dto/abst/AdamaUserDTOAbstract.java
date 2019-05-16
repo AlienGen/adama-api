@@ -1,19 +1,17 @@
 package com.adama.api.web.rest.user.dto.abst;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.Email;
-
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.tenant.TenantEntityAbstract;
 import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Email;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 /**
  * An abstract DTO for the user entity.

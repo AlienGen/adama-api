@@ -1,23 +1,20 @@
 package com.adama.api.security.abst;
 
-import java.util.Collections;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-
+import com.adama.api.config.AdamaProperties;
+import com.adama.api.domain.user.AdamaUser;
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.repository.user.AdamaUserRepositoryInterface;
+import com.adama.api.security.AdamaAuthoritiesConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.adama.api.config.AdamaProperties;
-import com.adama.api.domain.user.AdamaUser;
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.repository.user.AdamaUserRepositoryInterface;
-import com.adama.api.security.AdamaAuthoritiesConstants;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import java.util.Collections;
+import java.util.Optional;
 
 /**
  * Authenticate a user from the database.
@@ -34,9 +31,9 @@ public abstract class AdamaUserDetailsServiceAbstract<D extends DeleteEntityAbst
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(final String login) {
-		log.debug("Authenticating {}", login);
+		log.info("Authenticating {}", login);
 		String lowercaseLogin = login.toLowerCase();
-		Optional<A> userFromDatabase = userRepository.findOneByLogin(lowercaseLogin);
+		Optional<A> userFromDatabase = userRepository.findByLogin(lowercaseLogin);
 		if (!userFromDatabase.isPresent() && userRepository.count() == 0) {
 			// if no user created, we give access as admin (for the first login)
 			return new org.springframework.security.core.userdetails.User(adamaProperties.getSecurity().getDefaultFirstLogin(), passwordEncoder.encode(adamaProperties.getSecurity()

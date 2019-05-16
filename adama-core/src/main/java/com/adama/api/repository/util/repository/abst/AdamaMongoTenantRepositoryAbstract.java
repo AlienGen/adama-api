@@ -1,20 +1,19 @@
 package com.adama.api.repository.util.repository.abst;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-
-import java.io.Serializable;
-import java.util.List;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.domain.util.domain.abst.tenant.TenantEntityAbstract;
+import com.adama.api.repository.util.repository.AdamaMongoRepository;
+import com.adama.api.security.TenantChecker;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.util.Assert;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.domain.util.domain.abst.tenant.TenantEntityAbstract;
-import com.adama.api.repository.util.repository.AdamaMongoRepository;
-import com.adama.api.security.TenantChecker;
+import java.io.Serializable;
+import java.util.List;
+
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 /**
  * Adama Repository base implementation for Mongo with multi tenancy
@@ -45,7 +44,6 @@ public abstract class AdamaMongoTenantRepositoryAbstract<D extends DeleteEntityA
 		return super.save(addClientToIterable(entities));
 	}
 
-	@Override
 	public T findOne(ID id) {
 		Assert.notNull(id, "The given id must not be null!");
 		T entity = mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName());

@@ -1,12 +1,11 @@
 package com.adama.api.service.util.service;
 
-import java.util.List;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 /**
  * Service Interface for managing Entity.

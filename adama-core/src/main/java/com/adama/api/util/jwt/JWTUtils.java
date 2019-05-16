@@ -1,10 +1,9 @@
 package com.adama.api.util.jwt;
 
-import java.util.Optional;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.util.StringUtils;
+import java.util.Optional;
 
 public class JWTUtils {
 	public final static String AUTHORIZATION_HEADER = "Authorization";

@@ -1,9 +1,9 @@
 package com.adama.api.service.mail;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+
+import javax.servlet.http.HttpServletRequest;
 
 public interface AdamaMailServiceInterface<U extends AdamaUser<? extends DeleteEntityAbstract>> {
 	/**

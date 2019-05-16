@@ -1,9 +1,8 @@
 package com.adama.api.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.cors.CorsConfiguration;
-
-import lombok.Data;
 
 /**
  * Properties specific to Adama.

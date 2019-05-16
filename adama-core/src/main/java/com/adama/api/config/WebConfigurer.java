@@ -1,15 +1,10 @@
 package com.adama.api.config;
 
-import java.util.Arrays;
-
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.MimeMappings;
-import org.springframework.boot.context.embedded.ServletContextInitializer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.server.MimeMappings;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -17,14 +12,17 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.inject.Inject;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import java.util.Arrays;
 
 /**
  * Configuration of web application with Servlet 3.0 APIs.
  */
 @Slf4j
 @Configuration
-public class WebConfigurer implements ServletContextInitializer, EmbeddedServletContainerCustomizer {
+public class WebConfigurer implements ServletContextInitializer, WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
 	@Inject
 	private Environment env;
 	@Inject
@@ -40,7 +38,7 @@ public class WebConfigurer implements ServletContextInitializer, EmbeddedServlet
 	 * Set up Mime types and, if needed, set the document root.
 	 */
 	@Override
-	public void customize(ConfigurableEmbeddedServletContainer container) {
+	public void customize(ConfigurableServletWebServerFactory container) {
 		MimeMappings mappings = new MimeMappings(MimeMappings.DEFAULT);
 		mappings.add("html", "text/html;charset=utf-8");
 		mappings.add("json", "text/html;charset=utf-8");

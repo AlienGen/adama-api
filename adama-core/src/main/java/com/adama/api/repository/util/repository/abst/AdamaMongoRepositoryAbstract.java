@@ -1,28 +1,19 @@
 package com.adama.api.repository.util.repository.abst;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.repository.util.repository.AdamaMongoRepository;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.set.ListOrderedSet;
+import org.bson.Document;
+import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,20 +22,25 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.repository.util.repository.AdamaMongoRepository;
-import com.mongodb.AggregationOutput;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import javax.inject.Inject;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Abstract Repository base implementation for Mongo.
  * 
  */
+@Slf4j
 public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstract, ID extends Serializable> implements AdamaMongoRepository<T, ID> {
 	public final MongoOperations mongoOperations;
 	public final MongoEntityInformation<T, ID> entityInformation;
+	@Inject
+	public MongoTemplate mongoTemplate;
 
 	/**
 	 * Creates a new {@link AdamaMongoRepositoryAbstract} for the given
@@ -74,8 +70,19 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 		return entity;
 	}
 
+	/**
+	 * @deprecated Retrocompatibility
+	 *
+	 * @param iterable
+	 * @param <S>
+	 * @return
+	 */
+	public <S extends T> List<S> save(Iterable<S> iterable) {
+		return this.saveAll(iterable);
+	}
+
 	@Override
-	public <S extends T> List<S> save(Iterable<S> entities) {
+	public <S extends T> List<S> saveAll(Iterable<S> entities) {
 		Assert.notNull(entities, "The given Iterable of entities not be null!");
 		List<S> result = convertIterableToList(entities);
 		boolean allNew = result.parallelStream().allMatch(entity -> !entityInformation.isNew(entity));
@@ -89,10 +96,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	@Override
-	public abstract T findOne(ID id);
-
-	@Override
-	public boolean exists(ID id) {
+	public boolean existsById(ID id) {
 		Assert.notNull(id, "The given id must not be null!");
 		Query query = new Query(getIdCriteria(id));
 		Class<T> entityClass = entityInformation.getJavaType();
@@ -106,9 +110,9 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	@Override
-	public void delete(ID id) {
+	public void deleteById(ID id) {
 		Assert.notNull(id, "The given id must not be null!");
-		T entity = findOne(id);
+		T entity = findById(id).get();
 		Assert.notNull(entity, "Cannot find the entity with this id!");
 		entity.setActive(false);
 		save(entity);
@@ -117,11 +121,11 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	@Override
 	public void delete(T entity) {
 		Assert.notNull(entity, "The given entity must not be null!");
-		delete(entityInformation.getId(entity));
+		deleteById(entityInformation.getId(entity));
 	}
 
 	@Override
-	public void delete(Iterable<? extends T> entities) {
+	public void deleteAll(Iterable<? extends T> entities) {
 		Assert.notNull(entities, "The given Iterable of entities not be null!");
 		entities.forEach(entity -> delete(entity));
 	}
@@ -176,15 +180,50 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	@Override
-	public T findOne(Optional<Query> query) {
+	public Optional<T> findById(ID id) {
+		return Optional.of(mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName()));
+	}
+
+	public T findById(Optional<Query> query) {
 		return query.map(myquery -> mongoOperations.findOne(myquery, entityInformation.getJavaType(), entityInformation.getCollectionName())).orElse(null);
+	}
+
+	@Override
+	public <S extends T> Optional<S> findOne(Example<S> example) {
+		return null; // TODO
+	}
+
+	@Override
+	public <S extends T> List<S> findAll(Example<S> example) {
+		return null; // TODO
+	}
+
+	@Override
+	public <S extends T> List<S> findAll(Example<S> example, Sort sort) {
+		return null; // TODO
+	}
+
+	@Override
+	public <S extends T> Page<S> findAll(Example<S> example, Pageable pageable) {
+		return null; // TODO
+	}
+
+	@Override
+	public <S extends T> long count(Example<S> example) {
+		return 0; // TODO
+	}
+
+	@Override
+	public <S extends T> boolean exists(Example<S> example) {
+		return false; // TODO
 	}
 
 	@Override
 	public List<T> findAll(Optional<Query> query) {
 		Optional<Sort> sortOptional = Optional.empty();
 		Optional<Pageable> pageableOptional = Optional.empty();
-		return findAll(query, sortOptional, pageableOptional);
+		return mongoOperations.find(query.get(), entityInformation.getJavaType());
+		// return findAll(query, sortOptional, pageableOptional);
 	}
 
 	@Override
@@ -196,7 +235,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	@Override
-	public Iterable<T> findAll(Iterable<ID> ids) {
+	public Iterable<T> findAllById(Iterable<ID> ids) {
 		List<ID> parameters = convertIterableToList(ids);
 		Optional<Query> queryOptional = Optional.of(new Query(new Criteria(entityInformation.getIdAttribute()).in(parameters)));
 		Optional<Sort> sortOptional = Optional.empty();
@@ -283,50 +322,58 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 			}
 			return mongoOperations.find(query, entityInformation.getJavaType(), entityInformation.getCollectionName());
 		}
-		Optional<Query> fitlerQuery = Optional.of(query);
+		Optional<Query> filterQuery = Optional.of(query);
 		// FIXME sort: works for only one criteria
 		// FIXME sort: for multi-criteria the sort is not specialized
 		// (citeria 1, than 2 if entities both have same criteria 1)
-		Set<T> result = new HashSet<>();
+		ListOrderedSet<T> result = new ListOrderedSet<>();
 		if (!orderDBRefList.isEmpty()) {
-			orderDBRefList.forEach(order -> result.addAll(findAllWithDBRef(fitlerQuery, order)));
+			orderDBRefList.forEach(order -> result.addAll(findAllWithDBRef(filterQuery, order)));
 		}
 		if (!orderPrimitiveList.isEmpty()) {
-			result.addAll(sortPrimitiveWithCaseInsensitive(fitlerQuery, orderPrimitiveList, pageableOptional));
+			return sortPrimitiveWithCaseInsensitive(filterQuery, orderPrimitiveList, pageableOptional);
 		}
-		return result.stream().collect(Collectors.toList());
+		return result.asList();
 	}
 
 	private List<T> sortPrimitiveWithCaseInsensitive(Optional<Query> query, List<Order> orderPrimitiveList, Optional<Pageable> pageable) {
-		DBCollection coll = mongoOperations.getCollection(entityInformation.getCollectionName());
-		List<DBObject> pipe = new ArrayList<>();
-		query.ifPresent(myQuery -> {
+		MongoCollection collection = mongoOperations.getCollection(entityInformation.getCollectionName());
+		List<AggregationOperation> operations = new ArrayList<>();
+		query.ifPresent(q -> {
 			DBObject match = new BasicDBObject();
-			match.put("$match", myQuery.getQueryObject());
-			pipe.add(match);
+			match.put("$match", q.getQueryObject());
+			operations.add(new DBObjectToAggregationOperation(match));
 		});
 		DBObject prjflds = new BasicDBObject();
 		prjflds.put("doc", "$$ROOT");
 		orderPrimitiveList.stream().forEach(order -> prjflds.put("insensitive" + order.getProperty(), new BasicDBObject("$toLower", "$" + order.getProperty())));
 		DBObject project = new BasicDBObject();
 		project.put("$project", prjflds);
-		pipe.add(project);
+		operations.add(new DBObjectToAggregationOperation(project));
 		DBObject sortflds = new BasicDBObject();
 		orderPrimitiveList.stream().forEach(order -> sortflds.put("insensitive" + order.getProperty(), Direction.ASC.equals(order.getDirection()) ? 1 : -1));
 		DBObject sort = new BasicDBObject();
 		sort.put("$sort", sortflds);
-		pipe.add(sort);
+		operations.add(new DBObjectToAggregationOperation(sort));
 		pageable.ifPresent(myPage -> {
 			DBObject skip = new BasicDBObject();
 			skip.put("$skip", myPage.getOffset());
-			pipe.add(skip);
+			operations.add(new DBObjectToAggregationOperation(skip));
 			DBObject limit = new BasicDBObject();
 			limit.put("$limit", myPage.getPageSize());
-			pipe.add(limit);
+			operations.add(new DBObjectToAggregationOperation(limit));
 		});
-		AggregationOutput agg = coll.aggregate(pipe);
-		Stream<T> map = StreamSupport.stream(agg.results().spliterator(), true).map(result -> mongoOperations.getConverter().read(entityInformation.getJavaType(), (DBObject) result.get("doc")));
-		return map.collect(Collectors.toList());
+		AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).build();
+		Aggregation aggregation = Aggregation.newAggregation(operations).withOptions(options);
+		AggregationResults<Document> results = mongoOperations.aggregate(aggregation, entityInformation.getCollectionName(), Document.class);
+		List<T> objects = new ArrayList<>();
+		log.warn("Aggregation query done! Convertion of DBObject to entities...");
+		for (Document result : results) {
+			Document bson = (Document) result.get("doc");
+			objects.add(mongoOperations.getConverter().read(entityInformation.getJavaType(), bson));
+		}
+		log.warn("DBObject converted to entities!");
+		return objects;
 	}
 
 	private List<T> findAllWithDBRef(Optional<Query> query, Order order) {
@@ -407,4 +454,17 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	protected abstract Criteria getIdCriteria(Object id);
 
 	protected abstract Criteria getFilterCriteria();
+
+	public class DBObjectToAggregationOperation implements AggregationOperation {
+		private String jsonOperation;
+
+		public DBObjectToAggregationOperation(DBObject operation) {
+			this.jsonOperation = ((BasicDBObject) operation).toJson();
+		}
+
+		@Override
+		public Document toDocument(AggregationOperationContext aggregationOperationContext) {
+			return aggregationOperationContext.getMappedObject(Document.parse(jsonOperation));
+		}
+	}
 }

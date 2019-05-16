@@ -1,11 +1,11 @@
 package com.adama.api.web.rest.util.mapper.abst;
 
+import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
+import com.adama.api.web.rest.util.mapper.DTOMapperInterface;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
-import com.adama.api.web.rest.util.mapper.DTOMapperInterface;
 
 public abstract class DTOMapperAbstract<D extends Serializable, A extends AdamaDtoAbstract> implements DTOMapperInterface<D, A> {
 	@Override

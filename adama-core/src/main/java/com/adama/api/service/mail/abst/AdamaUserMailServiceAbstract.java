@@ -1,23 +1,5 @@
 package com.adama.api.service.mail.abst;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Locale;
-import java.util.Optional;
-
-import javax.annotation.PostConstruct;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.CharEncoding;
-import org.springframework.context.MessageSource;
-import org.springframework.core.env.Environment;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-
 import com.adama.api.config.AdamaProperties;
 import com.adama.api.domain.user.AdamaUser;
 import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
@@ -25,8 +7,23 @@ import com.adama.api.service.mail.AdamaMailServiceInterface;
 import com.adama.api.service.user.AdamaUserServiceInterface;
 import com.adama.api.util.http.HttpUtils;
 import com.adama.api.util.security.SecurityUtils;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.CharEncoding;
+import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.annotation.PostConstruct;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Service for sending e-mails.
@@ -98,7 +95,7 @@ public abstract class AdamaUserMailServiceAbstract<A extends AdamaUser<? extends
 	public void sendErrorEmail(Exception e, HttpServletRequest request) {
 		String subject = "[" + env.getProperty("spring.application.name") + "] Application Error: " + request.getRequestURL();
 		String emailUser = SecurityUtils.getCurrentUserLogin().map(login -> {
-			Optional<A> user = userService.findOneByLogin(login);
+			Optional<A> user = userService.findByLogin(login);
 			if (user.isPresent()) {
 				return user.get().getEmail();
 			}

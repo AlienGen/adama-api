@@ -1,16 +1,13 @@
 package com.adama.api.domain.file;
 
-import java.io.Serializable;
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.springframework.data.mongodb.core.mapping.Field;
-
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.io.Serializable;
 
 /**
  * An abstract Adama file

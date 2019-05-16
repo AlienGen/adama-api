@@ -1,15 +1,13 @@
 package com.adama.api.config;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.adama.api.web.rest.util.http.HeaderUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import com.adama.api.web.rest.util.http.HeaderUtil;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @ControllerAdvice

@@ -1,5 +1,16 @@
 package com.adama.api.service.file.abs;
 
+import com.adama.api.config.AdamaProperties;
+import com.adama.api.domain.file.AdamaFileAbstract;
+import com.adama.api.repository.file.AdamaFileRepositoryInterface;
+import com.adama.api.service.file.AdamaFileServiceInterface;
+import com.amazonaws.HttpMethod;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.*;
+import org.springframework.util.StreamUtils;
+
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,24 +19,6 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.time.ZonedDateTime;
 import java.util.Date;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.util.StreamUtils;
-
-import com.adama.api.config.AdamaProperties;
-import com.adama.api.domain.file.AdamaFileAbstract;
-import com.adama.api.repository.file.AdamaFileRepositoryInterface;
-import com.adama.api.service.file.AdamaFileServiceInterface;
-import com.amazonaws.HttpMethod;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
 
 public abstract class AdamaFileServiceAbstract<A extends AdamaFileAbstract, R extends AdamaFileRepositoryInterface<A>> implements AdamaFileServiceInterface<A> {
 	private AdamaFileRepositoryInterface<A> repo;
@@ -36,7 +29,7 @@ public abstract class AdamaFileServiceAbstract<A extends AdamaFileAbstract, R ex
 
 	@Override
 	public A findOne(String id) {
-		A entity = repo.findOne(id);
+		A entity = repo.findById(id).get();
 		return entity;
 	}
 

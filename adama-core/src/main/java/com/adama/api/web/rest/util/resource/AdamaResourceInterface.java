@@ -1,20 +1,17 @@
 package com.adama.api.web.rest.util.resource;
 
-import java.net.URISyntaxException;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
+import com.adama.api.service.excel.exception.ExcelException;
+import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.adama.api.domain.util.domain.abst.delete.DeleteEntityAbstract;
-import com.adama.api.service.excel.exception.ExcelException;
-import com.adama.api.web.rest.util.dto.abst.AdamaDtoAbstract;
-
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URISyntaxException;
 
 public interface AdamaResourceInterface<T extends DeleteEntityAbstract, D extends AdamaDtoAbstract> {
 	/**
