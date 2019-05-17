@@ -48,7 +48,7 @@ public interface AdamaServiceInterface<D extends DeleteEntityAbstract> {
 	/**
 	 * Get a list of "id" adamaEntity.
 	 * 
-	 * @param id
+	 * @param idList
 	 *            the id of the entity
 	 * @return the entity list
 	 */
@@ -57,7 +57,7 @@ public interface AdamaServiceInterface<D extends DeleteEntityAbstract> {
 	/**
 	 * Get a list of "id" adamaEntity.
 	 * 
-	 * @param id
+	 * @param idList
 	 *            the id of the entity
 	 * @param sort
 	 *            the sort

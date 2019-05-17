@@ -15,6 +15,9 @@ import org.apache.poi.hssf.util.AreaReference;
 import org.apache.poi.hssf.util.CellReference;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFRow;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -51,85 +54,103 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 
 	@Override
 	public <T> InputStream createExcelOrdered(List<T> objectList, String entityName, Comparator<? super String> comparator) throws ExcelException {
-		XSSFWorkbook wb;
+		SXSSFWorkbook wb = new SXSSFWorkbook(1000);
+		log.debug("Creating Excel sheet...");
 		try {
-			wb = getWorkWook(entityName);
-			XSSFSheet entitySheet = wb.getSheet(entityName);
-			if (objectList != null && objectList.size() != 0) {
-				// create the style
-				this.dateCellStyle = wb.createCellStyle();
-				this.dateCellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("d-mmm-yy"));
-				this.dateCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-				this.cellStyle = wb.createCellStyle();
-				this.cellStyle.setWrapText(true);
-				this.cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-				// create a list of map for each object, each object could have
-				// a size of fieldName different
-				List<Map<String, Object>> listMap = objectList.parallelStream().map(object -> {
-					try {
-						return new JsonFlattener(mapper.writeValueAsString(object)).flattenAsMap();
-					} catch (JsonProcessingException e) {
-						log.error(e.getMessage(), e);
-						throw new UncheckedIOException(e.getMessage(), e);
-					}
-				}).collect(Collectors.toList());
-				// we get a KeySet with all the elements of each keySet
-				List<String> headerList = listMap.parallelStream().flatMap(map -> map.keySet().stream()).filter(distinctByKey(String::toLowerCase)).sorted(comparator).collect(Collectors.toList());
-				// we create the first Row with the keyName
-				Row firstRow = entitySheet.getRow(0);
-				IntStream.range(0, headerList.size()).forEach(i -> {
-					Cell cell = firstRow.createCell(i);
-					cell.setCellValue(headerList.get(i));
-				});
-				// we write the value of each object to the correct column one
-				// by one
-				int currentRowIndex = 1;
-				for (T object : objectList) {
-					Row rowToAddEntity = entitySheet.createRow(currentRowIndex);
-					writeRow(object, headerList.size(), rowToAddEntity, entitySheet);
-					currentRowIndex++;
+			wb.createSheet(entityName);
+			SXSSFSheet entitySheet = wb.getSheet(entityName);
+			entitySheet.createRow(0);
+			if (objectList == null || objectList.isEmpty()) {
+				log.debug("Empty list.");
+				return commitChange(wb);
+			}
+			log.debug("Create the style...");
+			// create the style
+			this.dateCellStyle = wb.createCellStyle();
+			this.dateCellStyle.setDataFormat((short) BuiltinFormats.getBuiltinFormat("d-mmm-yy"));
+			this.dateCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+			this.cellStyle = wb.createCellStyle();
+			this.cellStyle.setWrapText(true);
+			this.cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+			log.debug("Mapping items as key-value...");
+			// create a list of map for each object, each object could have
+			// a size of fieldName different
+			List<Map<String, Object>> listMap = objectList.parallelStream().map(object -> {
+				try {
+					return new JsonFlattener(mapper.writeValueAsString(object)).flattenAsMap();
+				} catch (JsonProcessingException e) {
+					log.error(e.getMessage(), e);
+					throw new UncheckedIOException(e.getMessage(), e);
 				}
-				/* Create Table into Existing Sheet */
-				XSSFTable my_table = entitySheet.createTable();
-				/* get CTTable object */
-				CTTable cttable = my_table.getCTTable();
-				/* Define Styles */
-				CTTableStyleInfo table_style = cttable.addNewTableStyleInfo();
-				table_style.setName("TableStyleMedium9");
-				/* Define Style Options */
-				table_style.setShowColumnStripes(false);
-				// showColumnStripes=0
-				table_style.setShowRowStripes(true);
-				// showRowStripes=1
-				/* Define the data range including headers */
-				AreaReference my_data_range = new AreaReference(new CellReference(0, 0), new CellReference(objectList.size(), headerList.size() - 1));
-				/* Set Range to the Table */
-				cttable.setRef(my_data_range.formatAsString());
-				cttable.setDisplayName(entityName);
-				cttable.setName(entityName.toUpperCase());
-				cttable.setId(1L);
-				CTTableColumns columns = cttable.addNewTableColumns();
-				columns.setCount(headerList.size());
-				// define number of columns
-				CTAutoFilter autofilter = cttable.addNewAutoFilter();
-				for (int i = 0; i < headerList.size(); i++) {
-					CTTableColumn column = columns.addNewTableColumn();
-					column.setName("Column" + i);
-					column.setId(i + 1);
-					CTFilterColumn filter = autofilter.addNewFilterColumn();
-					filter.setColId(i + 1);
-					filter.setShowButton(true);
-				}
-				for (int i = 0; i < headerList.size(); i++) {
-					entitySheet.autoSizeColumn(i);
-					// Include width of drop down button
-					if (entitySheet.getColumnWidth(i) < 60000) {
-						entitySheet.setColumnWidth(i, entitySheet.getColumnWidth(i) + 900);
+			}).collect(Collectors.toList());
+			log.debug("Creating header...");
+			// we get a KeySet with all the elements of each keySet
+			List<String> headerList = listMap.parallelStream().flatMap(map -> map.keySet().stream()).filter(distinctByKey(String::toLowerCase)).sorted(comparator).collect(Collectors.toList());
+			int headerSize = headerList.size();
+			// we create the first Row with the keyName
+			Row firstRow = entitySheet.getRow(0);
+			IntStream.range(0, headerSize).forEach(i -> {
+				Cell cell = firstRow.createCell(i);
+				cell.setCellValue(headerList.get(i));
+			});
+			log.debug("Writing values...");
+			// we write the value of each object to the correct column one
+			// by one
+			int currentRowIndex = 1;
+			for (Map<String, Object> object : listMap) {
+				Row rowToAddEntity = entitySheet.createRow(currentRowIndex);
+				for (int i = 0; i < headerSize; i++) {
+					Cell cell = rowToAddEntity.createCell(i);
+					Object value = object.get(headerList.get(i));
+					if (value != null) {
+						fillFieldWithObject(value, cell);
 					}
+				}
+				currentRowIndex++;
+			}
+			log.debug("Defining styling...");
+			/* Create Table into Existing Sheet */
+			// XSSFTable my_table = entitySheet.createTable();
+			// /* get CTTable object */
+			// CTTable cttable = my_table.getCTTable();
+			// /* Define Styles */
+			// CTTableStyleInfo table_style = cttable.addNewTableStyleInfo();
+			// table_style.setName("TableStyleMedium9");
+			// /* Define Style Options */
+			// table_style.setShowColumnStripes(false);
+			// // showColumnStripes=0
+			// table_style.setShowRowStripes(true);
+			// // showRowStripes=1
+			// /* Define the data range including headers */
+			// AreaReference my_data_range = new AreaReference(new
+			// CellReference(0, 0), new CellReference(objectList.size(),
+			// headerList.size() - 1));
+			// /* Set Range to the Table */
+			// cttable.setRef(my_data_range.formatAsString());
+			// cttable.setDisplayName(entityName);
+			// cttable.setName(entityName.toUpperCase());
+			// cttable.setId(1L);
+			// CTTableColumns columns = cttable.addNewTableColumns();
+			// columns.setCount(headerSize);
+			// // define number of columns
+			// CTAutoFilter autofilter = cttable.addNewAutoFilter();
+			// for (int i = 0; i < headerSize; i++) {
+			// CTTableColumn column = columns.addNewTableColumn();
+			// column.setName("Column" + i);
+			// column.setId(i + 1);
+			// CTFilterColumn filter = autofilter.addNewFilterColumn();
+			// filter.setColId(i + 1);
+			// filter.setShowButton(true);
+			// }
+			for (int i = 0; i < headerSize; i++) {
+				// entitySheet.autoSizeColumn(i);
+				// Include width of drop down button
+				if (entitySheet.getColumnWidth(i) < 60000) {
+					entitySheet.setColumnWidth(i, entitySheet.getColumnWidth(i) + 900);
 				}
 			}
-			return commitChange(wb, entityName);
-		} catch (IOException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
+			return commitChange(wb);
+		} catch (IOException | IllegalArgumentException | SecurityException e) {
 			log.error(e.getMessage(), e);
 			throw new ExcelException(e.getMessage(), e);
 		}
@@ -223,6 +244,7 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 	}
 
 	private <T> void checkWorkBookIntegrity(XSSFWorkbook wb, String entityName) {
+		log.debug("Integrity check...");
 		// we check if sheets for this model exist, if not we create it
 		if (wb.getSheetIndex(entityName) == -1) {
 			wb.createSheet(entityName);
@@ -236,66 +258,72 @@ public class ExcelServiceImpl implements ExcelServiceInterface {
 		}
 	}
 
-	private <T> void writeRow(T object, int numberOfColumn, Row rowToAddEntity, XSSFSheet entitySheet) throws IllegalArgumentException, IllegalAccessException, JsonProcessingException {
-		Map<String, Object> objectMap = new JsonFlattener(mapper.writeValueAsString(object)).flattenAsMap();
-		for (int i = 0; i < numberOfColumn; i++) {
-			Cell cell = rowToAddEntity.createCell(i);
-			Row firstRow = entitySheet.getRow(0);
-			Cell cellTop = firstRow.getCell(i);
-			Object value = objectMap.get(cellTop.getStringCellValue());
-			if (value != null) {
-				fillFieldWithObject(value, cell);
-			}
-		}
-	}
-
-	private void fillFieldWithObject(Object value, Cell cell) throws IllegalArgumentException, IllegalAccessException {
+	private void fillFieldWithObject(Object value, Cell cell) throws IllegalArgumentException {
 		// log.info("Object " + value.getClass() + " -> " + value);
 		cell.setCellValue("BUG DURING EXTRACT");
+		if (value instanceof String) {
+			cell.setCellValue((String) value);
+			// try {
+			// ZonedDateTime myDate = ZonedDateTime.parse((String) value,
+			// DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+			// cell.setCellValue(Date.from(myDate.toInstant()));
+			// cell.setCellStyle(this.dateCellStyle);
+			// } catch (DateTimeParseException dtpe) {
+			// String stringValue = (String) value;
+			// Document doc = Jsoup.parse(stringValue);
+			// FormattingHtml formatter = new FormattingHtml();
+			// NodeTraversor traversor = new NodeTraversor(formatter);
+			// traversor.traverse(doc);
+			// RichTextString richTextString = new
+			// XSSFRichTextString(formatter.toString());
+			// cell.setCellValue(richTextString);
+			// }
+			return;
+		}
 		if (value instanceof Boolean) {
 			cell.setCellValue((Boolean) value);
+			return;
 		}
 		if (value instanceof Date) {
 			cell.setCellValue((Date) value);
 			cell.setCellStyle(this.dateCellStyle);
+			return;
 		}
 		if (value instanceof ZonedDateTime) {
 			cell.setCellValue(((ZonedDateTime) value).toString());
 			cell.setCellStyle(this.dateCellStyle);
+			return;
 		}
 		if (value instanceof Double) {
 			cell.setCellValue((Double) value);
+			return;
 		}
 		if (value instanceof Long) {
 			cell.setCellValue((Long) value);
-		}
-		if (value instanceof Long) {
-			cell.setCellValue((Long) value);
+			return;
 		}
 		if (value instanceof BigDecimal) {
 			cell.setCellValue(((BigDecimal) value).doubleValue());
-		}
-		if (value instanceof String) {
-			try {
-				ZonedDateTime myDate = ZonedDateTime.parse((String) value, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
-				cell.setCellValue(Date.from(myDate.toInstant()));
-				cell.setCellStyle(this.dateCellStyle);
-			} catch (DateTimeParseException dtpe) {
-				String stringValue = (String) value;
-				Document doc = Jsoup.parse(stringValue);
-				FormattingHtml formatter = new FormattingHtml();
-				NodeTraversor traversor = new NodeTraversor(formatter);
-				traversor.traverse(doc);
-				RichTextString richTextString = new XSSFRichTextString(formatter.toString());
-				cell.setCellValue(richTextString);
-			}
+			return;
 		}
 	}
 
 	private <T> InputStream commitChange(XSSFWorkbook wb, String entityName) throws IOException {
+		log.debug("Commit changes...");
 		ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
 		try {
 			checkWorkBookIntegrity(wb, entityName);
+			wb.write(arrayOutputStream);
+		} finally {
+			arrayOutputStream.close();
+		}
+		return new ByteArrayInputStream(arrayOutputStream.toByteArray());
+	}
+
+	private <T> InputStream commitChange(SXSSFWorkbook wb) throws IOException {
+		log.debug("Commit changes...");
+		ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+		try {
 			wb.write(arrayOutputStream);
 		} finally {
 			arrayOutputStream.close();

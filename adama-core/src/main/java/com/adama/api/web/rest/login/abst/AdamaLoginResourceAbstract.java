@@ -50,18 +50,18 @@ public abstract class AdamaLoginResourceAbstract<D extends DeleteEntityAbstract,
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public ResponseEntity<?> authorize(@Valid @RequestBody LoginDTO loginDTO, HttpServletResponse response) {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword());
-			Authentication authentication = authenticationManager.authenticate(authenticationToken);
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			boolean rememberMe = (loginDTO.getRememberMe() == null) ? false : loginDTO.getRememberMe();
-			ZonedDateTime validityDate = tokenProvider.getExpiredTokenDate(rememberMe);
-			String accessToken = tokenProvider.createAccessToken(authentication, validityDate);
-			String refreshToken = tokenProvider.createRefreshToken(authentication);
-			TokenDTO tokenDTO = new TokenDTO();
-			tokenDTO.setAccessToken(accessToken);
-			tokenDTO.setRefreshToken(refreshToken);
-			tokenDTO.setRememberMe(loginDTO.getRememberMe());
-			response.addHeader(JWTUtils.AUTHORIZATION_HEADER, "Bearer " + accessToken);
-			return ResponseEntity.ok(tokenDTO);
+		Authentication authentication = authenticationManager.authenticate(authenticationToken);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		boolean rememberMe = (loginDTO.getRememberMe() == null) ? false : loginDTO.getRememberMe();
+		ZonedDateTime validityDate = tokenProvider.getExpiredTokenDate(rememberMe);
+		String accessToken = tokenProvider.createAccessToken(authentication, validityDate);
+		String refreshToken = tokenProvider.createRefreshToken(authentication);
+		TokenDTO tokenDTO = new TokenDTO();
+		tokenDTO.setAccessToken(accessToken);
+		tokenDTO.setRefreshToken(refreshToken);
+		tokenDTO.setRememberMe(loginDTO.getRememberMe());
+		response.addHeader(JWTUtils.AUTHORIZATION_HEADER, "Bearer " + accessToken);
+		return ResponseEntity.ok(tokenDTO);
 	}
 
 	@Override

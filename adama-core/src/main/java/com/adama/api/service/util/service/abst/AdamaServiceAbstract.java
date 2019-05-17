@@ -53,7 +53,7 @@ public abstract class AdamaServiceAbstract<D extends DeleteEntityAbstract, R ext
 
 	@Override
 	public Iterable<D> findAll(List<String> idList, Sort sort) {
-		return repo.findAll(idList, Optional.of(sort));
+		return repo.findAll(idList, sort);
 	}
 
 	@Override

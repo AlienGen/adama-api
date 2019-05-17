@@ -48,7 +48,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	 * 
 	 * @param metadata
 	 *            must not be {@literal null}.
-	 * @param template
+	 * @param mongoOperations
 	 *            must not be {@literal null}.
 	 */
 	public AdamaMongoRepositoryAbstract(MongoEntityInformation<T, ID> metadata, MongoOperations mongoOperations) {
@@ -165,27 +165,22 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 					.forEach(field -> criterias.add(Criteria.where(field.getName()).regex(key, "i")));
 			Query query = new Query();
 			query.addCriteria(new Criteria().orOperator(criterias.toArray(new Criteria[criterias.size()]))).with(pageable);
-			Optional<Query> queryPageable = Optional.ofNullable(query);
-			Optional<Sort> sortPageable = Optional.ofNullable(pageable.getSort());
-			Optional<Pageable> pageableSort = Optional.ofNullable(pageable);
-			List<T> list = findAll(queryPageable, sortPageable, pageableSort);
+			List<T> list = findAll(query, pageable.getSort(), pageable);
 			Long count = count(query);
 			result = new PageImpl<>(list, pageable, count);
 		} else {
-			Optional<Query> queryPageable = Optional.empty();
-			Optional<Pageable> pageableSort = Optional.ofNullable(pageable);
-			result = findAllQueryPageable(queryPageable, pageableSort);
+			result = findAllQueryPageable(null, pageable);
 		}
 		return result;
 	}
 
 	@Override
 	public Optional<T> findById(ID id) {
-		return Optional.of(mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName()));
+		return Optional.ofNullable(mongoOperations.findById(id, entityInformation.getJavaType(), entityInformation.getCollectionName()));
 	}
 
-	public T findById(Optional<Query> query) {
-		return query.map(myquery -> mongoOperations.findOne(myquery, entityInformation.getJavaType(), entityInformation.getCollectionName())).orElse(null);
+	public T findById(Query query) {
+		return mongoOperations.findOne(query, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
 
 	@Override
@@ -219,46 +214,33 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	@Override
-	public List<T> findAll(Optional<Query> query) {
-		Optional<Sort> sortOptional = Optional.empty();
-		Optional<Pageable> pageableOptional = Optional.empty();
-		return mongoOperations.find(query.get(), entityInformation.getJavaType());
+	public List<T> findAll(Query query) {
+		return mongoOperations.find(query, entityInformation.getJavaType());
 		// return findAll(query, sortOptional, pageableOptional);
 	}
 
 	@Override
 	public List<T> findAll() {
-		Optional<Query> queryOptional = Optional.empty();
-		Optional<Sort> sortOptional = Optional.empty();
-		Optional<Pageable> pageableOptional = Optional.empty();
-		return findAll(queryOptional, sortOptional, pageableOptional);
+		return findAll(null, null, null);
 	}
 
 	@Override
 	public Iterable<T> findAllById(Iterable<ID> ids) {
 		List<ID> parameters = convertIterableToList(ids);
-		Optional<Query> queryOptional = Optional.of(new Query(new Criteria(entityInformation.getIdAttribute()).in(parameters)));
-		Optional<Sort> sortOptional = Optional.empty();
-		Optional<Pageable> pageableOptional = Optional.empty();
-		return findAll(queryOptional, sortOptional, pageableOptional);
+		return findAll(new Query(new Criteria(entityInformation.getIdAttribute()).in(parameters)), null, null);
 	}
 
 	@Override
-	public List<T> findAll(Iterable<ID> ids, Optional<Sort> sort) {
+	public List<T> findAll(Iterable<ID> ids, Sort sort) {
 		List<ID> parameters = convertIterableToList(ids);
-		Optional<Query> queryOptional = Optional.of(new Query(new Criteria(entityInformation.getIdAttribute()).in(parameters)));
-		Optional<Pageable> pageableOptional = Optional.empty();
-		return findAll(queryOptional, sort, pageableOptional);
+		return findAll(new Query(new Criteria(entityInformation.getIdAttribute()).in(parameters)), sort, null);
 	}
 
 	@Override
 	public Page<T> findAll(final Pageable pageable) {
 		// query
 		Query query = new Query();
-		Optional<Query> queryOptional = Optional.ofNullable(query.with(pageable));
-		Optional<Sort> sortOptional = Optional.ofNullable(pageable.getSort());
-		Optional<Pageable> pageableOptional = Optional.ofNullable(pageable);
-		List<T> list = findAll(queryOptional, sortOptional, pageableOptional);
+		List<T> list = findAll(query.with(pageable), pageable.getSort(), pageable);
 		// count
 		Query queryCount = new Query(getFilterCriteria());
 		Long count = count(queryCount);
@@ -268,82 +250,82 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 
 	@Override
 	public List<T> findAll(Sort sort) {
-		Optional<Query> queryOptional = Optional.ofNullable(new Query().with(sort));
-		Optional<Sort> sortOptional = Optional.ofNullable(sort);
-		Optional<Pageable> pageableOptional = Optional.empty();
-		return findAll(queryOptional, sortOptional, pageableOptional);
+		Query query = new Query().with(sort);
+		return findAll(query, sort, null);
 	}
 
 	@Override
-	public Page<T> findAllQueryPageable(Optional<Query> queryOptional, Optional<Pageable> pageableOptional) {
+	public Page<T> findAllQueryPageable(Query query, Pageable pageable) {
+		Sort sort = pageable != null ? pageable.getSort() : null;
 		// query
-		Optional<Sort> sortOptional = Optional.empty();
-		List<T> list = findAll(queryOptional, sortOptional, pageableOptional);
+		List<T> list = findAll(query, sort, pageable);
 		// count
-		Query countQuery = queryOptional.orElse(new Query().addCriteria(getFilterCriteria()));
+		Query countQuery = query != null ? query : new Query().addCriteria(getFilterCriteria());
 		Long count = count(countQuery);
 		// result
-		return new PageImpl<>(list, pageableOptional.orElse(null), count);
+		return new PageImpl<>(list, pageable, count);
 	}
 
-	public Page<T> findAllQueryPageable(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional) {
+	public Page<T> findAllQueryPageable(Query query, Sort sort, Pageable pageable) {
 		// query
-		List<T> list = findAll(queryOptional, sortOptional, pageableOptional);
+		List<T> list = findAll(query, sort, pageable);
 		// count
-		Query countQuery = queryOptional.orElse(new Query().addCriteria(getFilterCriteria()));
+		Query countQuery = query != null ? query : new Query().addCriteria(getFilterCriteria());
 		Long count = count(countQuery);
 		// result
-		return new PageImpl<>(list, pageableOptional.orElse(null), count);
+		return new PageImpl<>(list, pageable, count);
 	}
 
-	public List<T> findAll(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional) {
+	public List<T> findAll(Query query, Sort sort, Pageable pageable) {
+		// Set default query.
+		if (query == null) {
+			query = new Query();
+		}
+		query.addCriteria(getFilterCriteria());
 		// get the list of sorting with primitive field
-		List<Order> orderPrimitiveList = sortOptional//
-				.map(//
-				mySortQuery -> StreamSupport.stream(mySortQuery.spliterator(), false)//
-						.filter(order -> isTheFieldExistAndIsPrimitive(order.getProperty()))//
-						.collect(Collectors.toList()) //
-				)//
-				.orElse(Collections.emptyList());
-		// get the list of sorting with DBRef field
-		List<Order> orderDBRefList = sortOptional//
-				.map(//
-				mySortQuery -> StreamSupport.stream(mySortQuery.spliterator(), false)//
-						.filter(order -> isTheFieldExistAndIsDBRef(order.getProperty()))//
-						.collect(Collectors.toList()))//
-				.orElse(Collections.emptyList());
-		Query query = queryOptional.orElse(new Query()).addCriteria(getFilterCriteria());
-		if (orderDBRefList.isEmpty() && orderPrimitiveList.isEmpty()) {
-			if (sortOptional.isPresent()) {
-				query.with(sortOptional.get());
+		List<Order> orderPrimitiveList = new ArrayList<>();
+		List<Order> orderDBRefList = new ArrayList<>();
+		if (sort != null) {
+			for (Order order : sort) {
+				if (isTheFieldExistAndIsPrimitive(order.getProperty())) {
+					orderPrimitiveList.add(order);
+				} else if (isTheFieldExistAndIsDBRef(order.getProperty())) {
+					orderDBRefList.add(order);
+				}
 			}
-			if (pageableOptional.isPresent()) {
-				query.with(pageableOptional.get());
+		}
+		// get the list of sorting with DBRef field
+		if (orderDBRefList.isEmpty() && orderPrimitiveList.isEmpty()) {
+			if (sort != null) {
+				query.with(sort);
+			}
+			if (pageable != null) {
+				query.with(pageable);
 			}
 			return mongoOperations.find(query, entityInformation.getJavaType(), entityInformation.getCollectionName());
 		}
-		Optional<Query> filterQuery = Optional.of(query);
 		// FIXME sort: works for only one criteria
 		// FIXME sort: for multi-criteria the sort is not specialized
 		// (citeria 1, than 2 if entities both have same criteria 1)
 		ListOrderedSet<T> result = new ListOrderedSet<>();
 		if (!orderDBRefList.isEmpty()) {
-			orderDBRefList.forEach(order -> result.addAll(findAllWithDBRef(filterQuery, order)));
+			final Query subquery = query;
+			orderDBRefList.forEach(order -> result.addAll(findAllWithDBRef(subquery, order)));
 		}
 		if (!orderPrimitiveList.isEmpty()) {
-			return sortPrimitiveWithCaseInsensitive(filterQuery, orderPrimitiveList, pageableOptional);
+			return sortPrimitiveWithCaseInsensitive(query, orderPrimitiveList, pageable);
 		}
 		return result.asList();
 	}
 
-	private List<T> sortPrimitiveWithCaseInsensitive(Optional<Query> query, List<Order> orderPrimitiveList, Optional<Pageable> pageable) {
+	private List<T> sortPrimitiveWithCaseInsensitive(Query query, List<Order> orderPrimitiveList, Pageable pageable) {
 		MongoCollection collection = mongoOperations.getCollection(entityInformation.getCollectionName());
 		List<AggregationOperation> operations = new ArrayList<>();
-		query.ifPresent(q -> {
+		if (query != null) {
 			DBObject match = new BasicDBObject();
-			match.put("$match", q.getQueryObject());
+			match.put("$match", query.getQueryObject());
 			operations.add(new DBObjectToAggregationOperation(match));
-		});
+		}
 		DBObject prjflds = new BasicDBObject();
 		prjflds.put("doc", "$$ROOT");
 		orderPrimitiveList.stream().forEach(order -> prjflds.put("insensitive" + order.getProperty(), new BasicDBObject("$toLower", "$" + order.getProperty())));
@@ -355,14 +337,14 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 		DBObject sort = new BasicDBObject();
 		sort.put("$sort", sortflds);
 		operations.add(new DBObjectToAggregationOperation(sort));
-		pageable.ifPresent(myPage -> {
+		if (pageable != null) {
 			DBObject skip = new BasicDBObject();
-			skip.put("$skip", myPage.getOffset());
+			skip.put("$skip", pageable.getOffset());
 			operations.add(new DBObjectToAggregationOperation(skip));
 			DBObject limit = new BasicDBObject();
-			limit.put("$limit", myPage.getPageSize());
+			limit.put("$limit", pageable.getPageSize());
 			operations.add(new DBObjectToAggregationOperation(limit));
-		});
+		}
 		AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).build();
 		Aggregation aggregation = Aggregation.newAggregation(operations).withOptions(options);
 		AggregationResults<Document> results = mongoOperations.aggregate(aggregation, entityInformation.getCollectionName(), Document.class);
@@ -376,15 +358,15 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 		return objects;
 	}
 
-	private List<T> findAllWithDBRef(Optional<Query> query, Order order) {
+	private List<T> findAllWithDBRef(Query query, Order order) {
 		Query queryFull = new Query();
-		query.ifPresent(myQuery -> {
-			for (String key : myQuery.getQueryObject().keySet()) {
-				Object object = myQuery.getQueryObject().get(key);
+		if (query != null) {
+			for (String key : query.getQueryObject().keySet()) {
+				Object object = query.getQueryObject().get(key);
 				Criteria criteria = Criteria.where(key).is(object);
 				queryFull.addCriteria(criteria);
 			}
-		});
+		}
 		List<T> fullEntityList = mongoOperations.find(queryFull, entityInformation.getJavaType(), entityInformation.getCollectionName());
 		int index = order.getProperty().indexOf(".");
 		String dbRefFieldName = order.getProperty().substring(0, index);
@@ -441,7 +423,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 
 	private boolean isTheFieldExistAndIsDBRef(String fieldName) {
 		try {
-			if (fieldName.indexOf(".") != -1) {
+			if (fieldName.contains(".")) {
 				Field orderField = entityInformation.getJavaType().getDeclaredField(fieldName.substring(0, fieldName.indexOf(".")));
 				return orderField.getAnnotation(DBRef.class) != null;
 			}

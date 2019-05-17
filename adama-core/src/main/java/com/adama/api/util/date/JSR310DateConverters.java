@@ -25,7 +25,6 @@ public final class JSR310DateConverters {
 		}
 	}
 
-	@WritingConverter
 	public static class DateToLocalDateConverter implements Converter<Date, LocalDate> {
 		public static final DateToLocalDateConverter INSTANCE = new DateToLocalDateConverter();
 
@@ -37,7 +36,6 @@ public final class JSR310DateConverters {
 		}
 	}
 
-	@ReadingConverter
 	public static class ZonedDateTimeToDateConverter implements Converter<ZonedDateTime, Date> {
 		public static final ZonedDateTimeToDateConverter INSTANCE = new ZonedDateTimeToDateConverter();
 
@@ -49,7 +47,6 @@ public final class JSR310DateConverters {
 		}
 	}
 
-	@WritingConverter
 	public static class DateToZonedDateTimeConverter implements Converter<Date, ZonedDateTime> {
 		public static final DateToZonedDateTimeConverter INSTANCE = new DateToZonedDateTimeConverter();
 
@@ -61,7 +58,6 @@ public final class JSR310DateConverters {
 		}
 	}
 
-	@WritingConverter
 	public static class ZonedDateTimeToStringConverter implements Converter<ZonedDateTime, String> {
 		public static final ZonedDateTimeToStringConverter INSTANCE = new ZonedDateTimeToStringConverter();
 
@@ -85,7 +81,6 @@ public final class JSR310DateConverters {
 		}
 	}
 
-	@WritingConverter
 	public static class LocalDateTimeToStringConverter implements Converter<LocalDate, String> {
 		public static final LocalDateTimeToStringConverter INSTANCE = new LocalDateTimeToStringConverter();
 

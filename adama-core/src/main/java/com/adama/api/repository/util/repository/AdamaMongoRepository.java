@@ -10,7 +10,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Adama Mongo specific {@link org.springframework.data.repository.Repository}
@@ -36,7 +35,7 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * @param pageable
 	 * @return
 	 */
-	Page<T> findAllQueryPageable(Optional<Query> query, Optional<Pageable> pageable);
+	Page<T> findAllQueryPageable(Query query, Pageable pageable);
 
 	/**
 	 * find all with the query, the sortable and the pageable
@@ -46,7 +45,7 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * @param pageable
 	 * @return
 	 */
-	Page<T> findAllQueryPageable(Optional<Query> queryOptional, Optional<Sort> sortOptional, Optional<Pageable> pageableOptional);
+	Page<T> findAllQueryPageable(Query query, Sort sort, Pageable pageable);
 
 	/**
 	 * find all with the query
@@ -55,7 +54,7 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * 
 	 * @return
 	 */
-	List<T> findAll(Optional<Query> query);
+	List<T> findAll(Query query);
 
 	/**
 	 * find all with the id list
@@ -65,7 +64,7 @@ public interface AdamaMongoRepository<T extends DeleteEntityAbstract, ID extends
 	 * 
 	 * @return
 	 */
-	List<T> findAll(Iterable<ID> idList, Optional<Sort> sort);
+	List<T> findAll(Iterable<ID> idList, Sort sort);
 	/**
 	 * find one with the query
 	 * 
