@@ -31,8 +31,7 @@ public abstract class AuditingEntityAbstract implements Serializable {
 	@LastModifiedBy
 	@Field(LASTMODIFIEDBY_FIELD_NAME)
 	protected String lastModifiedBy;
-	// FIXME: Not working with nested object.
-	// @LastModifiedDate
+	@LastModifiedDate
 	@Field(LASTMODIFIEDDATE_FIELD_NAME)
 	protected ZonedDateTime lastModifiedDate = ZonedDateTime.now();
 }
