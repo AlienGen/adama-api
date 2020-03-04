@@ -401,7 +401,7 @@ public abstract class AdamaMongoRepositoryAbstract<T extends DeleteEntityAbstrac
 	}
 
 	public long count(Query query) {
-		return mongoOperations.getCollection(entityInformation.getCollectionName()).count(query.getQueryObject());
+		return mongoOperations.count(query, entityInformation.getJavaType(), entityInformation.getCollectionName());
 	}
 
 	protected static <T> List<T> convertIterableToList(Iterable<T> entities) {
