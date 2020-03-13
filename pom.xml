@@ -11,9 +11,6 @@
     <artifactId>adama-parent</artifactId>
     <version>0.2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <prerequisites>
-        <maven>3.2.1</maven>
-    </prerequisites>
     <modules>
         <module>adama-conf</module>
         <module>adama-core</module>
