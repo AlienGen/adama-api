@@ -20,7 +20,7 @@
         <module>adama-swagger</module>
     </modules>
     <properties>
-        <adama-api.version>0.2.0-SNAPSHOT</adama-api.version>
+        <adama-api.version>0.2.1-SNAPSHOT</adama-api.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <aws-java-sdk-s3.version>1.11.18</aws-java-sdk-s3.version>
         <commons-lang.version>2.6</commons-lang.version>
