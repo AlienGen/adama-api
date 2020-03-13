@@ -4,7 +4,7 @@
     <parent>
         <artifactId>adama-parent</artifactId>
         <groupId>com.adama</groupId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>adama-conf</artifactId>
 </project>
