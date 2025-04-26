@@ -251,6 +251,12 @@
 				$urlDropdown.change();
 			});
 
+			// Setup jQuery ajax to set the baseUrl
+			$.ajaxSetup({
+				beforeSend: function(xhr, options) {
+					options.url = springfox.baseUrl() + options.url;
+				}
+			});
 		}
 
 	});
